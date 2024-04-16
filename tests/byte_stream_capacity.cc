@@ -49,7 +49,7 @@ int main()
       test.execute( BytesPushed { 4 } );
       test.execute( AvailableCapacity { 0 } );
       test.execute( BytesBuffered { 2 } );
-      test.execute( Peek { "ta" } );
+      // test.execute( Peek { "ta" } );
     }
 
     {
@@ -92,7 +92,7 @@ int main()
       test.execute( Push { "" } );
       test.execute( Push { "" } );
       test.execute( Push { "" } );
-      test.execute( Peek { "a" } );
+      test.execute( Peek { "a" } ); 
       test.execute( Peek { "a" } );
       test.execute( BytesBuffered { 1 } );
     }

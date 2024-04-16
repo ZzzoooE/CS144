@@ -1,36 +1,32 @@
 #pragma once
 
 #include <cstdint>
+#include <deque>
 #include <queue>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+
 
 class Reader;
 class Writer;
 
 class ByteStream
 {
-protected:
+protected:  //保护类成员只能在类中访问 如果设置为 private 那么用 Writer 继承时也无法访问
   uint64_t capacity_;
-  uint64_t pushed_;
-  uint64_t popped_;
-  bool has_error_;
-  bool is_closed_;
-  class StringQueue
-  {
-    std::string data_ {};
-    uint64_t popped_ { 0 };
+  // Please add any additional state to the ByteStream here, and not to the Writer and Reader interfaces.
+  //使用string_view维护字节流 通过remove_prefix和remove_suffix来O(1)的 push 和 pop 字符串(因为只需要在原地址上移动指针)
+  std::deque<std::string> buffer_{};
+  std::deque<std::string_view> viewbuffer_{};
 
-  public:
-    StringQueue() = default;
-    uint64_t size() const; // Size of the queue.
-    void push( char c );   // Push a single byte to the queue.
-    uint64_t pop(
-      uint64_t len ); // Pop specified number of bytes, and return the number of bytes that are popped successfully.
-    std::string_view peek() const; // Return a string_view of the queue.
-  } data_;
-
+  bool is_closed_{};
+  bool has_error_{};
+  
+  uint64_t bytes_buffered_{}; 
+  uint64_t bytes_pushed_{};
+  uint64_t bytes_popped_{};
+ 
 public:
   explicit ByteStream( uint64_t capacity );
 
@@ -72,3 +68,4 @@ public:
  * from a ByteStream Reader into a string;
  */
 void read( Reader& reader, uint64_t len, std::string& out );
+

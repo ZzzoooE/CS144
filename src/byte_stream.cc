@@ -1,103 +1,102 @@
-#include <stdexcept>
-
 #include "byte_stream.hh"
 
 using namespace std;
 
-ByteStream::ByteStream( uint64_t capacity )
-  : capacity_( capacity ), pushed_( 0 ), popped_( 0 ), has_error_( false ), is_closed_( false ), data_()
-{}
-
-uint64_t ByteStream::StringQueue::size() const
-{
-  return data_.size() - popped_;
-}
-
-void ByteStream::StringQueue::push( char c )
-{
-  data_.push_back( c );
-}
-
-uint64_t ByteStream::StringQueue::pop( uint64_t len )
-{
-  const uint64_t bytes_to_pop = std::min( len, data_.size() - popped_ );
-  popped_ += bytes_to_pop;
-
-  if ( popped_ >= data_.size() / 2 ) {
-    data_ = data_.substr( popped_ );
-    popped_ = 0;
-  }
-
-  return bytes_to_pop;
-}
-
-std::string_view ByteStream::StringQueue::peek() const
-{
-  return std::string_view { data_ }.substr( popped_ );
-}
+ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
 
 void Writer::push( string data )
 {
-  for ( auto c : data ) {
-    if ( data_.size() >= capacity_ ) {
-      break;
-    }
-    data_.push( c );
-    ++pushed_;
+  if (is_closed() || available_capacity() == 0 || data.empty()) {
+    return ;
   }
+  auto n = min(available_capacity(), data.size());
+  if (data.size() > n) {
+    data = data.substr(0, n);
+  }
+  buffer_.push_back(move(data));
+  viewbuffer_.emplace_back(buffer_.back());
+  bytes_buffered_ += n;
+  bytes_pushed_ += n;
 }
 
 void Writer::close()
 {
+  // Your code here.
   is_closed_ = true;
 }
 
 void Writer::set_error()
 {
+  // Your code here.
   has_error_ = true;
 }
 
 bool Writer::is_closed() const
 {
+  // Your code here.
   return is_closed_;
 }
 
 uint64_t Writer::available_capacity() const
 {
-  return capacity_ - data_.size();
+  // Your code here.
+  return capacity_ - bytes_buffered_;
 }
 
 uint64_t Writer::bytes_pushed() const
 {
-  return pushed_;
+  // Your code here.
+  return bytes_pushed_;
 }
 
 string_view Reader::peek() const
 {
-  return data_.peek();
+  // Your code here.
+  if ( viewbuffer_.empty() ) {
+    return {};
+  }
+  return viewbuffer_.front();
 }
 
 bool Reader::is_finished() const
 {
-  return is_closed_ && data_.size() == 0;
+  return is_closed_ && bytes_buffered() == 0;
 }
 
 bool Reader::has_error() const
 {
+  // Your code here.
   return has_error_;
 }
 
 void Reader::pop( uint64_t len )
 {
-  popped_ += data_.pop( len );
+  // Your code here.
+  auto n = min(len, bytes_buffered());
+  while (n > 0 && !buffer_.empty()) {
+    auto sz = viewbuffer_.front().size();
+    if (n < sz) {
+      viewbuffer_.front().remove_prefix(n);
+      bytes_popped_ += n;
+      bytes_buffered_ -= n;
+      return ;
+    } 
+    bytes_popped_ += sz;
+    bytes_buffered_ -= sz;
+    n -= sz;
+    buffer_.pop_front();
+    viewbuffer_.pop_front();
+  }
 }
 
 uint64_t Reader::bytes_buffered() const
 {
-  return data_.size();
+  // Your code here.
+  return bytes_buffered_;
 }
 
 uint64_t Reader::bytes_popped() const
 {
-  return popped_;
+  // Your code here.
+  return bytes_popped_;
 }
