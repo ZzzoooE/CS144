@@ -28,6 +28,7 @@ protected:  //保护类成员只能在类中访问 如果设置为 private 那�
   uint64_t bytes_popped_{};
  
 public:
+  
   explicit ByteStream( uint64_t capacity );
 
   // Helper functions (provided) to access the ByteStream's Reader and Writer interfaces
@@ -40,6 +41,7 @@ public:
 class Writer : public ByteStream
 {
 public:
+  uint64_t capacity();
   void push( std::string data ); // Push data to stream, but only as much as available capacity allows.
 
   void close();     // Signal that the stream has reached its ending. Nothing more will be written.
@@ -68,4 +70,5 @@ public:
  * from a ByteStream Reader into a string;
  */
 void read( Reader& reader, uint64_t len, std::string& out );
+
 

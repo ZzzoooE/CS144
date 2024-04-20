@@ -24,6 +24,7 @@ void read( Reader& reader, uint64_t len, std::string& out )
   }
 }
 
+
 Reader& ByteStream::reader()
 {
   static_assert( sizeof( Reader ) == sizeof( ByteStream ),

@@ -110,7 +110,8 @@ int main()
       // Submission within existing
       const size_t cap = { 1000 };
       ReassemblerTestHarness test { "insert within existing section", cap };
-
+      // 01234
+      //  bcd
       test.execute( Insert { "bcd", 1 } );
       test.execute( Insert { "c", 2 } );
 

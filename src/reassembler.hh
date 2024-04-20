@@ -6,18 +6,30 @@
 #include <cassert>
 #include <iostream>
 #include <string>
+#include <unordered_map>
+#include <set>
 
 class Reassembler
 {
 private:
-  // The index of the first byte stored in the Reassembler.
-  uint64_t front { 0 };
-  // Number of set bytes in data.
-  uint64_t bytes_valid { 0 };
-  // Whether the last substring has been inserted.
-  bool last_substring_inserted { false };
-  // A pair represents validity and data of a byte.
-  std::deque<std::pair<bool, char>> buffer {};
+    bool _eof{};
+    uint64_t final_index{};
+    uint64_t _next_readIndex{};
+    uint64_t _unassembledbytes{};
+    uint64_t _capacity{};    //!< The maximum number of bytes
+    struct block {
+      uint64_t l, r; 
+      std::string str{};
+
+      struct blockCmp {
+        inline bool operator()(const block &lhs, const block &rhs) const {
+          return lhs.l < rhs.l || (lhs.l == rhs.l && lhs.r < rhs.r);
+        }
+      };
+
+    };
+
+    std::set<block, block::blockCmp> S{};
 
 public:
   /*
@@ -41,7 +53,8 @@ public:
    * The Reassembler should close the stream after writing the last byte.
    */
   void insert( uint64_t first_index, std::string data, bool is_last_substring, Writer& output );
-
+  uint64_t first_unacceptable_index();
+  void tryclose(Writer& output);
   // How many bytes are stored in the Reassembler itself?
   uint64_t bytes_pending() const;
 };

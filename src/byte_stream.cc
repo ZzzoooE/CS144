@@ -4,6 +4,10 @@ using namespace std;
 
 ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
 
+uint64_t Writer::capacity() {
+  return capacity_;
+}
+
 void Writer::push( string data )
 {
   if (is_closed() || available_capacity() == 0 || data.empty()) {
