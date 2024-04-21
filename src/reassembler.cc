@@ -20,9 +20,7 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   }
   R = min(R, first_unacceptable_index - 1);
   auto L = max(first_index, _next_readIndex);
-  if (L > R) {
-      return ;
-  }
+
   block t{L, R, data.substr(L - first_index, R - L + 1)};
   auto it = S.lower_bound({L, R, ""});
 
@@ -87,3 +85,5 @@ uint64_t Reassembler::bytes_pending() const
   // Your code here.
   return _unassembledbytes;
 }
+
+

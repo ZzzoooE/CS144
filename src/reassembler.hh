@@ -53,8 +53,8 @@ public:
    * The Reassembler should close the stream after writing the last byte.
    */
   void insert( uint64_t first_index, std::string data, bool is_last_substring, Writer& output );
-  uint64_t first_unacceptable_index();
   void tryclose(Writer& output);
   // How many bytes are stored in the Reassembler itself?
   uint64_t bytes_pending() const;
+
 };
