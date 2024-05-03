@@ -73,24 +73,28 @@ bool Reader::has_error() const
   return has_error_;
 }
 
-void Reader::pop( uint64_t len )
+std::string Reader::pop( uint64_t len )
 {
   // Your code here.
+  string res{};
   auto n = min(len, bytes_buffered());
   while (n > 0 && !buffer_.empty()) {
     auto sz = viewbuffer_.front().size();
     if (n < sz) {
       viewbuffer_.front().remove_prefix(n);
+      res += buffer_.front().substr(0, n);
       bytes_popped_ += n;
       bytes_buffered_ -= n;
-      return ;
+      return res;
     } 
     bytes_popped_ += sz;
     bytes_buffered_ -= sz;
     n -= sz;
+    res += buffer_.front();
     buffer_.pop_front();
     viewbuffer_.pop_front();
   }
+  return res;
 }
 
 uint64_t Reader::bytes_buffered() const

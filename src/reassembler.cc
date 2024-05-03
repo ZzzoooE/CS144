@@ -35,9 +35,9 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   if (it != S.begin()) {
     auto pre_r = prev(it)->r;
     if (pre_r >= L - 1) {
-       --it;
+      --it;
       t.l = it->l;
-      t.str = it->str + (pre_r == L - 1 ? t.str : t.str.substr(pre_r - L + 1));
+      t.str = it->str + t.str.substr(pre_r - L + 1);
       _unassembledbytes -= it->str.size();
       it = S.erase(it);
     }
